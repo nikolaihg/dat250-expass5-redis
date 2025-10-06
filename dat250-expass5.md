@@ -192,8 +192,76 @@ Actually checking that it worked using the `redis-cli`:
   - Key format: poll:{pollId}:counts (Redis HASH)
   - TTL = 60 seconds.
 
-### Step 5: Testing via Bruno
-Created a collection: `poll-collection.json` and imported this into bruno. Changed the uuids to the ones in the sample data method (`seedSampleData`) and tested.
+### Step 5: Testing with curl
+#### REST api
+- Show users
+```bash
+nikolai@LAPTOP-6UOFH1KM:~/documents/dat250/dat250-expass5-redis (main)$ curl -s http://localhost:8080/users | jq .
+[
+  {
+    "id": "26aceab4-f919-45b5-b387-88217259cefa",
+    "username": "carol",
+    "email": "carol@example.com",
+    "createdPolls": [],
+    "votes": []
+  },
+  {
+    "id": "2387bb92-3cfe-4e13-80a0-453a1e36ae27",
+    "username": "alice",
+    "email": "alice@example.com",
+    "createdPolls": [],
+    "votes": []
+  },
+  {
+    "id": "b42e7d05-5743-4a28-a3b8-a9432b084ccf",
+    "username": "bob",
+    "email": "bob@example.com",
+    "createdPolls": [],
+    "votes": []
+  }
+] 
+```
+- Show polls
+```bash
+nikolai@LAPTOP-6UOFH1KM:~/documents/dat250/dat250-expass5-redis (main)$ curl -s http://localhost:8080/polls | jq .
+[
+  {
+    "id": "bfe1f24f-52e2-4b80-a677-dfc0f6c727e6",
+    "question": "Pineapple or Banana?",
+    "publishedAt": "2025-10-06T12:26:53.717023252Z",
+    "validUntil": "2025-10-13T12:26:53.717024819Z",
+    "voteOptions": [
+      {
+        "id": "9ea28938-4bfc-4d9c-9665-0bf069903618",
+        "caption": "Pineapple",
+        "presentationOrder": 1
+      },
+      {
+        "id": "085a3849-f8eb-45a7-997b-8940d8d37a32",
+        "caption": "Banana",
+        "presentationOrder": 2
+      }
+    ]
+  }
+]
+```
+- Vote (alice votes for pineapple):
+```bash
+nikolai@LAPTOP-6UOFH1KM:~/documents/dat250/dat250-expass5-redis (main)$ curl -X POST http://localhost:8080/polls/bfe1f24f-52e2-4b80-a677-dfc0f6c727e6/vote   -H "Content-Type: application/json"   -d '{"userId":"2387bb92-3cfe-4e13-80a0-453a1e36ae27", "presentationOrder":1}'
+vote recorded (cache updated)n
+```
+#### In redis:
+Poll before and after voting twice on option 2.
+```bash
+127.0.0.1:6379> keys *
+1) "poll:bfe1f24f-52e2-4b80-a677-dfc0f6c727e6:counts"
+127.0.0.1:6379> HGETALL poll:bfe1f24f-52e2-4b80-a677-dfc0f6c727e6:counts
+1) "1"
+2) "1"
+127.0.0.1:6379> HGETALL poll:bfe1f24f-52e2-4b80-a677-dfc0f6c727e6:counts
+1) "1"
+2) "3"
+```
 
 ### Technical Problems
 When running the java application I got these errors in the terminal, but the program still seems to work fine. I assume these are from either jedis og jackson that needs loggin so i added slf4j as a dependecy to the project, and the errors stopped showing up.
