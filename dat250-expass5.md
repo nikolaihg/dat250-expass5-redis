@@ -4,7 +4,7 @@
 - **Date:** October 2025
 
 ## Code
-Code link: [GitHub Repository](https://github.com/nikolaihg/dat250-expass4)
+Code link: [nikolaihg/dat250-expass5-redis](https://github.com/nikolaihg/dat250-expass5-redis)
 
 ## Report
 
@@ -138,8 +138,7 @@ Can use hashes (`HSET`) to store the poll with operations: `HSET`, `HGET`, `HGET
 ### Step 3: Implementing Cache
 Started a new gradle project, and based the java objects on previous expass assignments.
 - `\domain` contains the domain model and objects.
-- `Application.java` is the entrypoint
-- `\manager\PollManager.java` manages the polls
+- `ExperimentApplication.java` is the entrypoint.
 
 Started by only making the redis part of the experiment (no rest) to keep it simple. Made two functions in `Application.java`:
 #### `trackLoggedInUsers(jedis);`
@@ -178,8 +177,23 @@ Actually checking that it worked using the `redis-cli`:
 2) "poll:votes:56d00e33-f427-4eb6-9655-5193fbfbc89d"
 ```
 
-### Step 4: Rest
-Since the previous step worked, you now could add the REST
+### Step 4: Adding REST functionality
+- Moved both of the previous experiments to their own file, so they can be run without rest integration.
+- Started on the rest integration based on expass 2/3.
+- Created a pollmanager: `\manager\PollManager.java`
+- `Application.java` as entrypoint for spring.
+- `CacheService`, redis cache.
+- `\controllers` rest controllers (based on previous expasses).
+  - `UserController.java`
+  - `PollController.java`
+  - `VoteController.java`
+- There is no JPA or Database every object is in memory (`ConcurrentHashMap`)
+- Cache key & data type:
+  - Key format: poll:{pollId}:counts (Redis HASH)
+  - TTL = 60 seconds.
+
+### Step 5: Testing via Bruno
+Created a collection: `poll-collection.json` and imported this into bruno. Changed the uuids to the ones in the sample data method (`seedSampleData`) and tested.
 
 ### Technical Problems
 When running the java application I got these errors in the terminal, but the program still seems to work fine. I assume these are from either jedis og jackson that needs loggin so i added slf4j as a dependecy to the project, and the errors stopped showing up.
@@ -188,3 +202,4 @@ SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
 SLF4J: Defaulting to no-operation (NOP) logger implementation
 SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
 ```
+After adding springboot I had to remove this dependecy again to get it to run, but the error did not show up again.

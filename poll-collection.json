@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "name": "Poll Backend Redis API",
+  "requests": [
+    {
+      "name": "List all polls",
+      "method": "GET",
+      "url": "http://localhost:8080/polls",
+      "headers": {
+        "Accept": "application/json"
+      }
+    },
+    {
+      "name": "Get poll by ID",
+      "method": "GET",
+      "url": "http://localhost:8080/polls/{{pollId}}",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "variables": {
+        "pollId": "REPLACE_WITH_POLL_UUID"
+      }
+    },
+    {
+      "name": "Get cached vote counts for poll",
+      "method": "GET",
+      "url": "http://localhost:8080/polls/{{pollId}}/counts",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "variables": {
+        "pollId": "REPLACE_WITH_POLL_UUID"
+      }
+    },
+    {
+      "name": "Create new poll",
+      "method": "POST",
+      "url": "http://localhost:8080/polls",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "type": "json",
+        "raw": {
+          "creatorId": "REPLACE_WITH_USER_UUID",
+          "question": "Do you like mango?",
+          "options": ["Yes", "No", "Maybe"]
+        }
+      }
+    },
+    {
+      "name": "Delete a poll",
+      "method": "DELETE",
+      "url": "http://localhost:8080/polls/{{pollId}}",
+      "variables": {
+        "pollId": "REPLACE_WITH_POLL_UUID"
+      }
+    }
+  ]
+}
